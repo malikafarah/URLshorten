@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+</head>
+<body>
+    <h1>Welcome to the URL Shortener!</h1>
+    <% if(locals.id) { %>
+        <p>Your shortened URL is: http://localhost:8001/url/<%= locals.id %></p>
+    <% } %>
+    <div>
+        <form action="/url" method="POST">
+            <label for="url">Enter URL to shorten:</label>
+            <input type="text" name="url" required>
+            <button type="submit">Generate</button>
+        </form>
+    </div>
+    <div>
+        <%if (locals.urls) { %>
+            <table>
+                <thead>
+                    <th>S.No</th>
+                    <th>Shortened URL</th>
+                    <th>Original URL</th>
+                    <th>Clicks</th>
+                </thead>
+                <tbody>
+                    <% locals.urls.forEach((url, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><a href="/<%= url.shortId %>">/<%= url.shortId %></a></td>
+                            <td><a href="<%= url.redirectURL %>" target="_blank"><%= url.redirectURL %></a></td>
+                            <td><%= url.visitHistory.length %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+</body>
+</html>

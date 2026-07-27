@@ -11,23 +11,34 @@ async function handleGenerateNewShortURL(req,res) {
         redirectURL : body.url,
         visitHistory: [],
     });
-    return res.json({ id: shortID });
+    return res.render('home',{
+        id: shortID,
+    })
 }
 
-async function handleRedirectURL(req,res) {
+async function handleRedirectURL(req, res) {
     const shortId = req.params.shortId;
-    const entry = await URL.findOneAndUpdate({
-        shortId
-    },
-    {$push:
+    
+    const entry = await URL.findOneAndUpdate(
+        { shortId },
         {
-        visitHistory: {
-            timestamp: Date.now()
-        },
+            $push: {
+                visitHistory: {
+                    timestamp: Date.now()
+                },
+            }
         }
-    });
+    );
+
+    // Add this safety check: If no matching shortId is found, return a 404 error
+    if (!entry) {
+        return res.status(404).send("Shortened URL not found");
+    }
+
+    // Now it is safe to redirect
     res.redirect(entry.redirectURL);
 }
+
 module.exports = {
     handleGenerateNewShortURL,
     handleRedirectURL,
