@@ -8,4 +8,8 @@ router.get('/',async (req,res) => {
     return res.render("home");
 })
 
+router.get('/user/signup', (req,res) =>{
+    return res.render('signup');
+})
+
 module.exports = router;

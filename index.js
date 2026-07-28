@@ -2,8 +2,11 @@ const express = require('express');
 const path = require('path');
 const {connectMongoDB} = require('./connections');
 const app = express();
+
 const staticRoute = require('./routes/staticRouter');
 const urlRoute = require("./routes/url");
+const userRoute = require("./routes/user");
+
 const URL = require("./models/url");
 
 const PORT = 8001;
@@ -24,6 +27,7 @@ app.get('/test',async (req,res)=>{
 });
 
 app.use("/url",urlRoute);
+app.use("/user",userRoute);
 app.use("/",staticRoute);
 
 app.listen(PORT,()=> console.log(`Server Started at PORT: ${PORT}`));
