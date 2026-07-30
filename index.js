@@ -2,7 +2,9 @@ const express = require('express');
 const path = require('path');
 const {connectMongoDB} = require('./connections');
 const cookieParser = require("cookie-parser");
-const {restrictToLoggedinUserOnly} = require('./middleware/auth');
+const {restrictToLoggedinUserOnly,
+    checkAuth,
+} = require('./middleware/auth');
 
 
 const staticRoute = require('./routes/staticRouter');
@@ -30,8 +32,9 @@ app.get('/',async (req,res)=>{
     });
 });
 
+
 app.use("/url",restrictToLoggedinUserOnly,urlRoute);
 app.use("/user",userRoute);
-app.use("/",staticRoute);
+app.use("/",checkAuth,staticRoute);
 
 app.listen(PORT,()=> console.log(`Server Started at PORT: ${PORT}`));

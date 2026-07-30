@@ -30,7 +30,7 @@
                     <% locals.urls.forEach((url, index) => { %>
                         <tr>
                             <td><%= index + 1 %></td>
-                            <td><a href="/<%= url.shortId %>">/<%= url.shortId %></a></td>
+                            <td><a href="url/<%= url.shortId %>">/<%= url.shortId %></a></td>
                             <td><a href="<%= url.redirectURL %>" target="_blank"><%= url.redirectURL %></a></td>
                             <td><%= url.visitHistory.length %></td>
                         </tr>
