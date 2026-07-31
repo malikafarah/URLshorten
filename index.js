@@ -11,8 +11,6 @@ const staticRoute = require('./routes/staticRouter');
 const urlRoute = require("./routes/url");
 const userRoute = require("./routes/user");
 
-const URL = require("./models/url");
-
 const app = express();
 const PORT = 8001;
 
@@ -24,14 +22,6 @@ app.set('views', path.resolve("./views"));
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 app.use(cookieParser());
-
-app.get('/',async (req,res)=>{
-    const allUrls = await URL.find({})
-    return res.render("home",{
-        urls:allUrls,
-    });
-});
-
 
 app.use("/url",restrictToLoggedinUserOnly,urlRoute);
 app.use("/user",userRoute);
