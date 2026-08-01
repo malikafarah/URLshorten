@@ -1,30 +1,37 @@
+// External packages
 const express = require('express');
 const path = require('path');
-const {connectMongoDB} = require('./connections');
 const cookieParser = require("cookie-parser");
-const {restrictToLoggedinUserOnly,
-    checkAuth,
-} = require('./middleware/auth');
 
+// Internal modules
+const { connectMongoDB } = require('./connections');
+const { restrictToLoggedinUserOnly, checkAuth } = require('./middleware/auth');
 
+// Route modules
 const staticRoute = require('./routes/staticRouter');
 const urlRoute = require("./routes/url");
 const userRoute = require("./routes/user");
 
+// Server initialization
 const app = express();
 const PORT = 8001;
 
+// Connect to MongoDB database
 connectMongoDB('mongodb://127.0.0.1:27017/short-url');
 
-app.set("view engine","ejs");
+// View engine configuration
+app.set("view engine", "ejs");
 app.set('views', path.resolve("./views"));
 
-app.use(express.json());
-app.use(express.urlencoded({extended:false}));
-app.use(cookieParser());
+// Middleware setup
+app.use(express.json()); // Body parser for JSON payloads
+app.use(express.urlencoded({ extended: false })); // Body parser for form submissions
+app.use(cookieParser()); // Middleware to parse HTTP cookies
 
-app.use("/url",restrictToLoggedinUserOnly,urlRoute);
-app.use("/user",userRoute);
-app.use("/",checkAuth,staticRoute);
+// Route mounting
+app.use("/user", userRoute); // Public user authentication routes (signup/login/logout)
+app.use("/url", restrictToLoggedinUserOnly, urlRoute); // Protected short URL generation and redirect routes
+app.use("/", checkAuth, staticRoute); // Main application UI routes
 
-app.listen(PORT,()=> console.log(`Server Started at PORT: ${PORT}`));
+// Start server
+app.listen(PORT, () => console.log(`Server Started at PORT: ${PORT}`));
