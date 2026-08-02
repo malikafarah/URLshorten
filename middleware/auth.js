@@ -1,37 +1,26 @@
-const {getUser} = require("../service/auth");
+const { getUser } = require("../service/auth");
 
-/**
- * Middleware that restricts route access to logged-in users only.
- * Redirects to the login page if no valid user token cookie is present.
- */
-async function restrictToLoggedinUserOnly(req,res,next) {
-    const userUid = req.cookies?.uid;
-
-    if(!userUid) return res.redirect("/user/login");
-    const user = getUser(userUid);
-
-    if(!user) return res.redirect("/user/login");
-
-    // Attach user payload to request object and proceed to next handler
+function checkForAuthentication(req, res, next) {
+    const tokenCookie = req.cookies?.token;
+    req.user = null;
+    if (!tokenCookie) return next();
+    const token = authorizationHeaderValue.split("Bearer ")[1];
+    const user = getUser(token);
     req.user = user;
-    next();
+    return next();
 }
 
-/**
- * Middleware that checks authentication status without enforcing login.
- * Attaches user to req.user if authenticated, or null/undefined if not logged in.
- */
-async function checkAuth(req,res,next) {
-    const userUid = req.cookies?.uid;
+function restrictTo(roles){
+    return function(req,res,next){
+        if(!req.user) return res.redirect("/user/login");
 
-    const user = getUser(userUid);
+        if(roles.includes(req.user.role)) return res.end("UnAuthorized");
 
-    // Attach user (or null) to request object
-    req.user = user;
-    next();
+        return next();
+    };
 }
 
 module.exports = {
-    restrictToLoggedinUserOnly,
-    checkAuth,
-}
+    checkForAuthentication,
+    restrictTo,
+};

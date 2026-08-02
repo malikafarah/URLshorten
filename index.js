@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 
 // Internal modules
 const { connectMongoDB } = require('./connections');
-const { restrictToLoggedinUserOnly, checkAuth } = require('./middleware/auth');
+const { checkForAuthentication, restrictTo } = require('./middleware/auth');
 
 // Route modules
 const staticRoute = require('./routes/staticRouter');
@@ -27,11 +27,12 @@ app.set('views', path.resolve("./views"));
 app.use(express.json()); // Body parser for JSON payloads
 app.use(express.urlencoded({ extended: false })); // Body parser for form submissions
 app.use(cookieParser()); // Middleware to parse HTTP cookies
+app.use(checkForAuthentication);
 
 // Route mounting
-app.use("/user", userRoute); // Public user authentication routes (signup/login/logout)
-app.use("/url", restrictToLoggedinUserOnly, urlRoute); // Protected short URL generation and redirect routes
-app.use("/", checkAuth, staticRoute); // Main application UI routes
+app.use("/user", restrictTo(["NORMAL","ADMIN"]),userRoute); // Public user authentication routes (signup/login/logout)
+app.use("/url", urlRoute); // Protected short URL generation and redirect routes
+app.use("/", staticRoute); // Main application UI routes
 
 // Start server
 app.listen(PORT, () => console.log(`Server Started at PORT: ${PORT}`));
